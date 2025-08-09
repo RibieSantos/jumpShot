@@ -235,11 +235,11 @@
                             <p class="text-sm text-gray-600">Players</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-3xl font-bold text-green-600">{{ $trainings->count() }}</p>
+                            <p class="text-3xl font-bold text-green-600">{{ $trainings->count() ?? 0 }}</p>
                             <p class="text-sm text-gray-600">Trainings</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-3xl font-bold text-purple-600">{{ $event->count() }}</p>
+                            <p class="text-3xl font-bold text-purple-600">{{ $event->count() ?? 0 }}</p>
                             <p class="text-sm text-gray-600">Events</p>
                         </div>
 
