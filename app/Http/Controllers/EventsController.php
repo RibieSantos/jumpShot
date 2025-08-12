@@ -44,7 +44,7 @@ class EventsController extends Controller
     $imageName = null;
 
     if ($request->hasFile('event_image')) {
-        // Store the image in storage/app/public/events
+        // Store in storage/app/public/events
         $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
         $request->file('event_image')->storeAs('public/events', $imageName);
     }
@@ -59,6 +59,7 @@ class EventsController extends Controller
 
     return redirect()->route('events.show')->with('success', 'Event successfully added!');
 }
+
 
 
     public function edit(Events $event)
