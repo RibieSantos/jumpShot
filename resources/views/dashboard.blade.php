@@ -239,7 +239,7 @@
                             <p class="text-sm text-gray-600">Trainings</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-3xl font-bold text-purple-600">{{ $event->count() ?? 0 }}</p>
+                            <p class="text-3xl font-bold text-purple-600">{{ $events->count() ?? 0 }}</p>
                             <p class="text-sm text-gray-600">Events</p>
                         </div>
 
