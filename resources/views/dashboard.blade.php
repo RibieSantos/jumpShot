@@ -64,7 +64,7 @@
                 <div class="p-6">
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="md:w-1/3">
-                            <img src="{{ asset('events/' . $events->event_image) }}" alt="{{ $events->title }}"
+                            <img src="{{ asset('storage/events/' . $events->event_image) }}" alt="{{ $events->title }}"
                                 class="w-full h-48 md:h-64 object-cover rounded-lg shadow-md">
                         </div>
                         <div class="md:w-2/3">

@@ -316,7 +316,7 @@
         {{-- Changed background gradient to deep blue --}} x-data="{
             active: 0,
             events: {{ $events->toJson() }},
-            imageBasePath: '{{ asset('events/') }}/',
+            imageBasePath: '{{ asset('storage/events/') }}/',
             isAnimating: false,
             autoplayInterval: null,
             next() {

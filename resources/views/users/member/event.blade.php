@@ -23,7 +23,7 @@
                         class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
                         <!-- Event Image -->
                         <div class="relative h-48 overflow-hidden">
-                            <img src="{{ asset('events/' . $event->event_image) }}" alt="{{ $event->title }}"
+                            <img src="{{ asset('storage/events/' . $event->event_image) }}" alt="{{ $event->title }}"
                                 class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                             <div
