@@ -2,6 +2,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Default Title')</title>
     <link rel="icon" type="image/png" href="{{ asset('Images/logo.jpg') }}">
     <!-- FontAwesome -->
@@ -236,7 +237,7 @@
                     </svg>
                 </button>
                 
-                <!-- Breadcrumb -->
+                <!-- Breadcrumb (Visible on larger screens) -->
                 <div class="sm:flex hidden items-center">
                     <img src="{{ asset('Images/IMG_0016.PNG') }}" class="h-8 w-8 rounded-full mr-3" alt="Logo">
                     <span class="text-xl font-bold text-yellow-400 bg-clip-text text-transparent">
@@ -244,7 +245,7 @@
                     </span>
                 </div>
             </div>
-            <!-- User Profile -->
+            <!-- User Profile Dropdown -->
             <div class="flex items-center space-x-4">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -281,10 +282,12 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-                
-                    </div>
+            </div>
         </header>
         <!-- Main Content -->
         <main class="flex-1 p-6 overflow-auto">
             @yield('content')
         </main>
+    </div>
+</body>
+</html>
