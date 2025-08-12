@@ -32,34 +32,34 @@ class EventsController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'event_date' => 'required|date',
-            'location' => 'required|string',
-            'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string',
+        'description' => 'required|string',
+        'event_date' => 'required|date',
+        'location' => 'required|string',
+        'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+    ]);
 
-        // Initialize image name as null
-        $imageName = null;
+    $imageName = null;
 
-        if ($request->hasFile('event_image')) {
-            $image = $request->file('event_image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('events'), $imageName);
-        }
-
-        Events::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'event_date' => $request->event_date,
-            'location' => $request->location,
-            'event_image' => $imageName // Will be null if no image uploaded
-        ]);
-
-        return redirect()->route('events.show')->with('success', 'Event successfully added!');
+    if ($request->hasFile('event_image')) {
+        // Store the image in storage/app/public/events
+        $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
+        $request->file('event_image')->storeAs('public/events', $imageName);
     }
+
+    Events::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'event_date' => $request->event_date,
+        'location' => $request->location,
+        'event_image' => $imageName
+    ]);
+
+    return redirect()->route('events.show')->with('success', 'Event successfully added!');
+}
+
 
     public function edit(Events $event)
     {
