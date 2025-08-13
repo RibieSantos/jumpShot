@@ -47,7 +47,12 @@ class EventsController extends Controller
         if ($request->hasFile('event_image')) {
             $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
 
-            // Store explicitly on the "public" disk
+            // Check if storage is writable
+            if (!is_writable(storage_path('app/public'))) {
+                return back()->withErrors(['event_image' => 'Storage folder is not writable.']);
+            }
+
+            // Store explicitly on public disk
             $request->file('event_image')->storeAs('events', $imageName, 'public');
         }
 
