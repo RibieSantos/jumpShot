@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Events;
 use App\Models\HistoryEvents;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EventsController extends Controller
 {
@@ -32,33 +33,34 @@ class EventsController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'title' => 'required|string',
-        'description' => 'required|string',
-        'event_date' => 'required|date',
-        'location' => 'required|string',
-        'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
-    ]);
+    {
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'event_date' => 'required|date',
+            'location' => 'required|string',
+            'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+        ]);
 
-    $imageName = null;
+        $imageName = null;
 
-    if ($request->hasFile('event_image')) {
-        // Store in storage/app/public/events
-        $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
-        $request->file('event_image')->storeAs('public/events', $imageName);
+        if ($request->hasFile('event_image')) {
+            $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
+
+            // Store explicitly on the "public" disk
+            $request->file('event_image')->storeAs('events', $imageName, 'public');
+        }
+
+        Events::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'event_date' => $request->event_date,
+            'location' => $request->location,
+            'event_image' => $imageName
+        ]);
+
+        return redirect()->route('events.show')->with('success', 'Event successfully added!');
     }
-
-    Events::create([
-        'title' => $request->title,
-        'description' => $request->description,
-        'event_date' => $request->event_date,
-        'location' => $request->location,
-        'event_image' => $imageName
-    ]);
-
-    return redirect()->route('events.show')->with('success', 'Event successfully added!');
-}
 
 
 
@@ -79,15 +81,17 @@ class EventsController extends Controller
 
         // Check if a new image is uploaded
         if ($request->hasFile('event_image')) {
-            // Delete old image if it exists
-            if ($event->event_image && file_exists(public_path('events/' . $event->event_image))) {
-                unlink(public_path('events/' . $event->event_image));
+            // Delete image if exists
+            if ($event->event_image && Storage::disk('public')->exists('events/' . $event->event_image)) {
+                Storage::disk('public')->delete('events/' . $event->event_image);
             }
 
             // Save the new image
             $image = $request->file('event_image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('events'), $imageName);
+            $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
+
+            // Store explicitly on the "public" disk
+            $request->file('event_image')->storeAs('events', $imageName, 'public');
 
             // Update with new image
             $event->update([
@@ -126,9 +130,9 @@ class EventsController extends Controller
             'event_date' => $request->event_date,
             'location' => $request->location,
         ]);
-        // Delete old image if it exists
-        if ($event->event_image && file_exists(public_path('events/' . $event->event_image))) {
-            unlink(public_path('events/' . $event->event_image));
+        // Delete image if exists
+        if ($event->event_image && Storage::disk('public')->exists('events/' . $event->event_image)) {
+            Storage::disk('public')->delete('events/' . $event->event_image);
         }
         $event->delete();
         return redirect()->route('events.show')->with('success', 'this event session is done!');
@@ -136,13 +140,15 @@ class EventsController extends Controller
 
     public function destroy(Events $event)
     {
-        // Delete old image if it exists
-        if ($event->event_image && file_exists(public_path('events/' . $event->event_image))) {
-            unlink(public_path('events/' . $event->event_image));
+
+        // Delete image if exists
+        if ($event->event_image && Storage::disk('public')->exists('events/' . $event->event_image)) {
+            Storage::disk('public')->delete('events/' . $event->event_image);
         }
+
         $event->delete();
 
-        return redirect()->route('events.show')->with('success', 'Event successfully deleted!');
+        return redirect()->route('events.show')->with('success', 'Event deleted successfully!');
     }
 
     //Member Page
@@ -170,6 +176,4 @@ class EventsController extends Controller
 
         return redirect()->away("https://calendar.google.com/calendar/render?$query");
     }
-
-    
 }
