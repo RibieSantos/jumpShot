@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Events;
 use App\Models\HistoryEvents;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,39 +34,37 @@ class EventsController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'event_date' => 'required|date',
-            'location' => 'required|string',
-            'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string',
+        'description' => 'required|string',
+        'event_date' => 'required|date',
+        'location' => 'required|string',
+        'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+    ]);
 
-        $imageName = null;
+    $imageUrl = null;
 
-        if ($request->hasFile('event_image')) {
-            $imageName = time() . '_' . $request->file('event_image')->getClientOriginalName();
+    if ($request->hasFile('event_image')) {
+        // Upload to Cloudinary
+        $uploadedFileUrl = Cloudinary::upload(
+            $request->file('event_image')->getRealPath(),
+            ['folder' => 'events'] // optional: organize in "events" folder in Cloudinary
+        )->getSecurePath();
 
-            // Check if storage is writable
-            if (!is_writable(storage_path('app/public'))) {
-                return back()->withErrors(['event_image' => 'Storage folder is not writable.']);
-            }
-
-            // Store explicitly on public disk
-            $request->file('event_image')->storeAs('events', $imageName, 'public');
-        }
-
-        Events::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'event_date' => $request->event_date,
-            'location' => $request->location,
-            'event_image' => $imageName
-        ]);
-
-        return redirect()->route('events.show')->with('success', 'Event successfully added!');
+        $imageUrl = $uploadedFileUrl; // Permanent Cloudinary URL
     }
+
+    Events::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'event_date' => $request->event_date,
+        'location' => $request->location,
+        'event_image' => $imageUrl // Store URL instead of filename
+    ]);
+
+    return redirect()->route('events.show')->with('success', 'Event successfully added!');
+}
 
 
 
