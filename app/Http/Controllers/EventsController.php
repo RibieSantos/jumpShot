@@ -33,26 +33,26 @@ class EventsController extends Controller
         return view('admin.event.add-events');
     }
 
-    public function store(Request $request)
+
+public function store(Request $request)
 {
     $request->validate([
         'title' => 'required|string',
         'description' => 'required|string',
         'event_date' => 'required|date',
         'location' => 'required|string',
-        'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+        'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
     ]);
 
     $imageUrl = null;
 
     if ($request->hasFile('event_image')) {
-        // Upload to Cloudinary
-        $uploadedFileUrl = Cloudinary::upload(
-            $request->file('event_image')->getRealPath(),
-            ['folder' => 'events'] // optional: organize in "events" folder in Cloudinary
-        )->getSecurePath();
-
-        $imageUrl = $uploadedFileUrl; // Permanent Cloudinary URL
+        // Store in Cloudinary and get the URL
+        $uploadedFile = $request->file('event_image');
+        $uploadedFileUrl = Cloudinary::upload($uploadedFile->getRealPath(), [
+            'folder' => 'events'
+        ])->getSecurePath();
+        $imageUrl = $uploadedFileUrl;
     }
 
     Events::create([
@@ -60,11 +60,12 @@ class EventsController extends Controller
         'description' => $request->description,
         'event_date' => $request->event_date,
         'location' => $request->location,
-        'event_image' => $imageUrl // Store URL instead of filename
+        'event_image' => $imageUrl,
     ]);
 
-    return redirect()->route('events.show')->with('success', 'Event successfully added!');
+    return redirect()->route('events.index')->with('success', 'Event created successfully!');
 }
+
 
 
 
